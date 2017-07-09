@@ -16,23 +16,37 @@ public class TaxiRideCleansingRunner {
 
 	public static void main(String[] args) throws Exception {
 
-		final String dataFilePath = "/home/dinesh/workspace/flink-java-project/nycTaxiRides.gz";
+		TaxiRideCleansingParameterParser params = new TaxiRideCleansingParameterParser();
+		if(params.parseParams(args)){
+			final String dataFilePath = params.getDataFilePath();
+			final int maxPassengerCnt = params.getMaxPassengerCnt();
+			final int minPassengerCnt = params.getMinPassengerCnt();
 
-		// get an ExecutionEnvironment
-		StreamExecutionEnvironment env =
-				StreamExecutionEnvironment.getExecutionEnvironment();
-		// configure event-time processing
-		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+			if(maxPassengerCnt < 0 || minPassengerCnt < 0) {
+				throw new Exception("Maximum number and Mininum number of passenger must be positive - Max: "
+						+ maxPassengerCnt + " Min: " + minPassengerCnt);
+			}
+			if(maxPassengerCnt < minPassengerCnt){
+				throw new Exception("Maximum number of passenger cannot be smaller than the Mininum number of passenger " +
+						"- Max: " + maxPassengerCnt + " Min: " + minPassengerCnt);
+			}
 
-		// get the taxi ride data stream
-		DataStream<TaxiRide> rides = env.addSource(
-				new TaxiRideSource(dataFilePath, MAX_EVENT_DELAY_DEFAULT, SERVING_SPEED_FACTOR_DEFAULT));
+			// get an ExecutionEnvironment
+			StreamExecutionEnvironment env =
+					StreamExecutionEnvironment.getExecutionEnvironment();
+			// configure event-time processing
+			env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-		TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing(0, 0);
-		DataStream<TaxiRide> filteredTaxis = taxiRideCleansing.execute(rides);
+			// get the taxi ride data stream
+			DataStream<TaxiRide> rides = env.addSource(
+					new TaxiRideSource(dataFilePath, MAX_EVENT_DELAY_DEFAULT, SERVING_SPEED_FACTOR_DEFAULT));
 
-		filteredTaxis.print();
-		env.execute("Running Taxi Ride Cleansing");
+			TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing(maxPassengerCnt, minPassengerCnt);
+			DataStream<TaxiRide> filteredTaxis = taxiRideCleansing.execute(rides);
+
+			filteredTaxis.print();
+			env.execute("Running Taxi Ride Cleansing");
+		}
 	}
 
 }
