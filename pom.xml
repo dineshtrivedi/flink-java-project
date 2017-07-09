@@ -91,11 +91,11 @@ under the License.
 			<artifactId>flink-clients_2.10</artifactId>
 			<version>${flink.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.data-artisans</groupId>
-			<artifactId>flink-training-exercises</artifactId>
-			<version>0.10.0</version>
-		</dependency>
+        <dependency>
+            <groupId>com.data-artisans</groupId>
+            <artifactId>flink-training-exercises</artifactId>
+            <version>0.10.0</version>
+        </dependency>
 
 		<!-- explicitly add a standard loggin framework, as Flink does not have
 			a hard dependency on one specific framework by default -->
