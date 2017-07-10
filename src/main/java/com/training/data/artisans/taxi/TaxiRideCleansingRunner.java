@@ -19,17 +19,6 @@ public class TaxiRideCleansingRunner {
 		TaxiRideCleansingParameterParser params = new TaxiRideCleansingParameterParser();
 		if(params.parseParams(args)){
 			final String dataFilePath = params.getDataFilePath();
-			final int maxPassengerCnt = params.getMaxPassengerCnt();
-			final int minPassengerCnt = params.getMinPassengerCnt();
-
-			if(maxPassengerCnt < 0 || minPassengerCnt < 0) {
-				throw new Exception("Maximum number and Mininum number of passenger must be positive - Max: "
-						+ maxPassengerCnt + " Min: " + minPassengerCnt);
-			}
-			if(maxPassengerCnt < minPassengerCnt){
-				throw new Exception("Maximum number of passenger cannot be smaller than the Mininum number of passenger " +
-						"- Max: " + maxPassengerCnt + " Min: " + minPassengerCnt);
-			}
 
 			// get an ExecutionEnvironment
 			StreamExecutionEnvironment env =
@@ -41,7 +30,7 @@ public class TaxiRideCleansingRunner {
 			DataStream<TaxiRide> rides = env.addSource(
 					new TaxiRideSource(dataFilePath, MAX_EVENT_DELAY_DEFAULT, SERVING_SPEED_FACTOR_DEFAULT));
 
-			TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing(maxPassengerCnt, minPassengerCnt);
+			TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing();
 			DataStream<TaxiRide> filteredTaxis = taxiRideCleansing.execute(rides);
 
 			filteredTaxis.print();

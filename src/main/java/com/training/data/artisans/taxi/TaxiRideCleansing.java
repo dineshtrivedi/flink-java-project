@@ -7,14 +7,6 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 
 public class TaxiRideCleansing {
 
-	private final int maxPassagengerCnt;
-	private final int minPassagengerCnt;
-
-	public TaxiRideCleansing(int maxPassagengerCnt, int minPassagengerCnt){
-		this.maxPassagengerCnt = maxPassagengerCnt;
-		this.minPassagengerCnt = minPassagengerCnt;
-	}
-
 	public DataStream<TaxiRide> execute(DataStream<TaxiRide> rides) throws Exception {
 		DataStream<TaxiRide> filteredRidesByNYC = rides
 				.filter(new NewYorkTaxiFilter());

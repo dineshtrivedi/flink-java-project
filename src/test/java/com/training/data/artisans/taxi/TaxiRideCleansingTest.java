@@ -39,7 +39,7 @@ public class TaxiRideCleansingTest extends StreamingMultipleProgramsTestBase {
 		env.setParallelism(1);
 		DataStream<TaxiRide> rides = env.fromCollection(taxiRides);
 
-		TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing(0, 0);
+		TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing();
 
 		DataStream<TaxiRide> filteredRides = taxiRideCleansing.execute(rides);
 
