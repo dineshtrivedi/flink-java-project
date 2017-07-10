@@ -14,7 +14,7 @@ public class TaxiRideCleansingParameterParserTest {
 	}
 
 	@Test
-	public void test_when_has_help_parameter_others_params_are_ignored() throws Exception {
+	public void testWhenHasHelpParameterOthersParamsAreIgnored() throws Exception {
 		String[] args = {"--help", "--input", "/this/path/should/not/be/read"};
 
 		boolean wasHelpPrinted = parser.parseParams(args);
@@ -24,7 +24,7 @@ public class TaxiRideCleansingParameterParserTest {
 	}
 
 	@Test(expected = Exception.class)
-	public void test_input_argument_required() throws Exception {
+	public void testInputArgumentRequired() throws Exception {
 		String[] args = {"--path", "/this/path/should/not/be/read"};
 
 		parser.parseParams(args);
@@ -32,7 +32,7 @@ public class TaxiRideCleansingParameterParserTest {
 	}
 
 	@Test
-	public void test_passing_all_parameters_happy_path() throws Exception {
+	public void testPassingAllParametersHappyPath() throws Exception {
 		final String expectedInput = "/this/path/should/not/be/read";
 
 		String[] args = {"--input", expectedInput};
