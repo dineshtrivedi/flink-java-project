@@ -2,6 +2,7 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/677d859f65a64277929491b9e13b5eaa)](https://www.codacy.com/app/dinesh-dart/flink-java-project?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dineshtrivedi/flink-java-project&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.org/dineshtrivedi/flink-java-project.svg?branch=master)](https://travis-ci.org/dineshtrivedi/flink-java-project)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/677d859f65a64277929491b9e13b5eaa)](https://www.codacy.com/app/dinesh-dart/flink-java-project?utm_source=github.com&utm_medium=referral&utm_content=dineshtrivedi/flink-java-project&utm_campaign=Badge_Coverage)
 
 flink-java-project tutorial - http://training.data-artisans.com/
 
