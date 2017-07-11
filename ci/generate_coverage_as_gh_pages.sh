@@ -6,7 +6,7 @@ SOURCE_BRANCH="master"
 TARGET_BRANCH="gh-pages"
 
 function compileGhPages {
-    echo_green "Script executed from: ${PWD}"
+    echo_green "Script executed from: ${PWD}\n"
     mkdir out
     cp -r ./target/site/jacoco-ut/* out
 }
