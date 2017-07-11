@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
 
-if [ ! -d "~/flink-training-exercises" ]; then
-  git clone https://github.com/dataArtisans/flink-training-exercises.git ~/flink-training-exercises
+. ci/utils.sh
+
+if [ ! -d "$HOME/flink-training-exercises" ]; then
+    echo_red "\nflink-training-exercises does not exist.\n"
+    echo_green "Cloning...\n"
+    dorun "git clone https://github.com/dataArtisans/flink-training-exercises.git $HOME/flink-training-exercises"
+    cd ~/flink-training-exercises
+else
+    echo_green "\nflink-training-exercises exists already.\n"
+
+    cd ~/flink-training-exercises
+    echo_green "\nCleaning repository\n"
+    dorun "git reset --hard"
+    dorun "git checkout ."
+    echo_green "\nPulling changes\n"
+    dorun "git pull"
 fi
 
-cd ~/flink-training-exercises
-git reset --hard
-git checkout .
-git pull
-mvn clean install
+dorun "mvn clean install"
