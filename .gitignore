@@ -28,3 +28,5 @@ target/
 nycTaxiRides
 Notes
 ci/codacy_credential_key.sh
+deploy_key
+deploy_key.pub

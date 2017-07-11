@@ -29,9 +29,25 @@ Essentially, the flink-training-exercise is cloned and built.
 
 Check the ci/install-flink-training-exercises.sh to understand how this process is done. 
 
-## Depencencies
+## Codacy
+You can find the reference [here](https://github.com/codacy/codacy-coverage-reporter#travis-ci)
+
+### Depencencies Ubuntu 16.04
 * sudo apt-get install jq
-* sudo apt-get install curl
+* sudo apt install curl
+
+## Travis updating gh-pages
+You can find the reference [here](https://gist.github.com/domenic/ec8b0fc8ab45f39403dd)
+
+### Dependencies Ubuntu 16.04
+* sudo apt install ruby
+* sudo apt-get install ruby-dev
+* sudo gem install travis
+
+### Finding gem
+In order to find the instalation path run:
+* gem environment | grep "\- INSTALLATION DIRECTORY"
 
 # References
 * https://ci.apache.org/projects/flink/flink-docs-release-1.3/dev/best_practices.html
+* Travis commit gh-pages - https://gist.github.com/domenic/ec8b0fc8ab45f39403dd
