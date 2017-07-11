@@ -27,4 +27,4 @@ target/
 *.gz
 nycTaxiRides
 Notes
-ci/env.sh
+ci/codacy_credential_key.sh
