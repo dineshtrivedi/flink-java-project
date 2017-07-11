@@ -1,4 +1,3 @@
-script: bash ./ci/generate_coverage_as_gh_pages.sh
 env:
   global:
   - ENCRYPTION_LABEL: "03a344a6b5dc"
@@ -20,3 +19,4 @@ before_install:
 
 after_success:
   - java -cp ~/codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter -l Java -r target/site/jacoco-ut/jacoco.xml
+  - ./ci/generate_coverage_as_gh_pages.sh

@@ -8,7 +8,7 @@ TARGET_BRANCH="gh-pages"
 function compileGhPages {
     echo_green "Script executed from: ${PWD}"
     mkdir out
-    cp -r target/site/jacoco-ut/* out
+    cp -r ./target/site/jacoco-ut/* out
 }
 
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
@@ -33,6 +33,7 @@ rm -rf out/**/* || exit 0
 
 # Run our compile script
 compileGhPages
+
 #
 ## Now let's go have some fun with the cloned repo
 cd out
