@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WordCount.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Flink Quickstart Job</a> &gt; <a href="index.source.html" class="el_package">org.apache.flink.quickstart</a> &gt; <span class="el_source">WordCount.java</span></div><h1>WordCount.java</h1><pre class="source lang-java linenums">package org.apache.flink.quickstart;
+
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * &quot;License&quot;); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+
+/**
+ * Implements the &quot;WordCount&quot; program that computes a simple word occurrence histogram
+ * over some sample data
+ *
+ * &lt;p&gt;
+ * This example shows how to:
+ * &lt;ul&gt;
+ * &lt;li&gt;write a simple Flink program.
+ * &lt;li&gt;use Tuple data types.
+ * &lt;li&gt;write and use user-defined functions.
+ * &lt;/ul&gt;
+ *
+ */
+<span class="nc" id="L40">public class WordCount {</span>
+
+	//
+	//	Program
+	//
+
+	public static void main(String[] args) throws Exception {
+
+		// set up the execution environment
+<span class="nc" id="L49">		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();</span>
+
+		// get input data
+<span class="nc" id="L52">		DataSet&lt;String&gt; text = env.fromElements(</span>
+				&quot;To be, or not to be,--that is the question:--&quot;,
+				&quot;Whether 'tis nobler in the mind to suffer&quot;,
+				&quot;The slings and arrows of outrageous fortune&quot;,
+				&quot;Or to take arms against a sea of troubles,&quot;
+				);
+
+<span class="nc" id="L59">		DataSet&lt;Tuple2&lt;String, Integer&gt;&gt; counts =</span>
+				// split up the lines in pairs (2-tuples) containing: (word,1)
+<span class="nc" id="L61">				text.flatMap(new LineSplitter())</span>
+				// group by the tuple field &quot;0&quot; and sum up tuple field &quot;1&quot;
+<span class="nc" id="L63">				.groupBy(0)</span>
+<span class="nc" id="L64">				.sum(1);</span>
+
+		// execute and print result
+<span class="nc" id="L67">		counts.print();</span>
+
+<span class="nc" id="L69">	}</span>
+
+	//
+	// 	User Functions
+	//
+
+	/**
+	 * Implements the string tokenizer that splits sentences into words as a user-defined
+	 * FlatMapFunction. The function takes a line (String) and splits it into
+	 * multiple pairs in the form of &quot;(word,1)&quot; (Tuple2&lt;String, Integer&gt;).
+	 */
+<span class="nc" id="L80">	public static final class LineSplitter implements FlatMapFunction&lt;String, Tuple2&lt;String, Integer&gt;&gt; {</span>
+
+		@Override
+		public void flatMap(String value, Collector&lt;Tuple2&lt;String, Integer&gt;&gt; out) {
+			// normalize and split the line
+<span class="nc" id="L85">			String[] tokens = value.toLowerCase().split(&quot;\\W+&quot;);</span>
+
+			// emit the pairs
+<span class="nc bnc" id="L88" title="All 2 branches missed.">			for (String token : tokens) {</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">				if (token.length() &gt; 0) {</span>
+<span class="nc" id="L90">					out.collect(new Tuple2&lt;String, Integer&gt;(token, 1));</span>
+				}
+			}
+<span class="nc" id="L93">		}</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

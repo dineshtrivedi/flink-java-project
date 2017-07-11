@@ -1,0 +1,11 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Flink Quickstart Job,org.apache.flink.quickstart,StreamingJob,10,0,0,0,4,0,2,0,2,0
+Flink Quickstart Job,org.apache.flink.quickstart,SocketTextStreamWordCount.LineSplitter,36,0,4,0,6,0,4,0,2,0
+Flink Quickstart Job,org.apache.flink.quickstart,SocketTextStreamWordCount,52,0,2,0,15,0,3,0,2,0
+Flink Quickstart Job,org.apache.flink.quickstart,WordCount,44,0,0,0,9,0,2,0,2,0
+Flink Quickstart Job,org.apache.flink.quickstart,WordCount.LineSplitter,36,0,4,0,6,0,4,0,2,0
+Flink Quickstart Job,org.apache.flink.quickstart,BatchJob,10,0,0,0,4,0,2,0,2,0
+Flink Quickstart Job,com.training.data.artisans.taxi,TaxiRideCleansing.NewYorkTaxiFilter,8,11,3,1,0,3,2,2,0,2
+Flink Quickstart Job,com.training.data.artisans.taxi,TaxiRideCleansingRunner,44,0,2,0,12,0,3,0,2,0
+Flink Quickstart Job,com.training.data.artisans.taxi,TaxiRideCleansing,0,11,0,0,0,4,0,2,0,2
+Flink Quickstart Job,com.training.data.artisans.taxi,TaxiRideCleansingParameterParser,0,43,0,2,0,17,0,5,0,4

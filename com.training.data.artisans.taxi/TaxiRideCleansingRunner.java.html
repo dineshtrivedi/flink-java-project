@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TaxiRideCleansingRunner.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Flink Quickstart Job</a> &gt; <a href="index.source.html" class="el_package">com.training.data.artisans.taxi</a> &gt; <span class="el_source">TaxiRideCleansingRunner.java</span></div><h1>TaxiRideCleansingRunner.java</h1><pre class="source lang-java linenums">package com.training.data.artisans.taxi;
+
+import com.dataartisans.flinktraining.exercises.datastream_java.datatypes.TaxiRide;
+import com.dataartisans.flinktraining.exercises.datastream_java.sources.TaxiRideSource;
+import org.apache.flink.streaming.api.TimeCharacteristic;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+
+<span class="nc" id="L9">public class TaxiRideCleansingRunner {</span>
+
+	// events are out of order by max 60 seconds
+	private static final int MAX_EVENT_DELAY_DEFAULT = 60;
+
+	// events of 10 minutes are served in 1 second (10 * 60) = 600s
+	private static final int SERVING_SPEED_FACTOR_DEFAULT = 600;
+
+	public static void main(String[] args) throws Exception {
+
+<span class="nc" id="L19">		TaxiRideCleansingParameterParser params = new TaxiRideCleansingParameterParser();</span>
+<span class="nc bnc" id="L20" title="All 2 branches missed.">		if(params.parseParams(args)){</span>
+<span class="nc" id="L21">			final String dataFilePath = params.getDataFilePath();</span>
+
+			// get an ExecutionEnvironment
+			StreamExecutionEnvironment env =
+<span class="nc" id="L25">					StreamExecutionEnvironment.getExecutionEnvironment();</span>
+			// configure event-time processing
+<span class="nc" id="L27">			env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);</span>
+
+			// get the taxi ride data stream
+<span class="nc" id="L30">			DataStream&lt;TaxiRide&gt; rides = env.addSource(</span>
+					new TaxiRideSource(dataFilePath, MAX_EVENT_DELAY_DEFAULT, SERVING_SPEED_FACTOR_DEFAULT));
+
+<span class="nc" id="L33">			TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing();</span>
+<span class="nc" id="L34">			DataStream&lt;TaxiRide&gt; filteredTaxis = taxiRideCleansing.execute(rides);</span>
+
+<span class="nc" id="L36">			filteredTaxis.print();</span>
+<span class="nc" id="L37">			env.execute(&quot;Running Taxi Ride Cleansing&quot;);</span>
+		}
+<span class="nc" id="L39">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
