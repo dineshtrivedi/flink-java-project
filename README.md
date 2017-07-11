@@ -6,8 +6,14 @@
 flink-java-project tutorial - http://training.data-artisans.com/
 
 ## Travis not working
-There is no version 0.10.0 in the [maven repository](https://mvnrepository.com/artifact/com.data-artisans/flink-training-exercises)
-I can't pull from github, there is no mvn-repo branch [link](https://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?rq=1)
+I have face problems to use flink-training-exercises package as a dependency.
+
+* There is no version 0.10.0 in the [maven repository](https://mvnrepository.com/artifact/com.data-artisans/flink-training-exercises)
+* I can't pull from github, there is no mvn-repo branch [link](https://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?rq=1)
+
+## Depencencies
+* sudo apt-get install jq
+* sudo apt-get install curl
 
 # References
 * https://ci.apache.org/projects/flink/flink-docs-release-1.3/dev/best_practices.html

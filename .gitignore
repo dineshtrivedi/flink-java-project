@@ -27,3 +27,4 @@ target/
 *.gz
 nycTaxiRides
 Notes
+ci/env.sh
