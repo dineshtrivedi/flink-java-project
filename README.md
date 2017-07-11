@@ -6,6 +6,7 @@
 
 flink-java-project tutorial - http://training.data-artisans.com/
 
+Since this project has no frontend I have configured TravisCI to create the github pages showing the coverage. Access coverage page [here](https://dineshtrivedi.github.io/flink-java-project/index.html).
 ## Travis 
 
 It wasn't possible to use TravisCI straight away. Check the problems in the Problems section.
