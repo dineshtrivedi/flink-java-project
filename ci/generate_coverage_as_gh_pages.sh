@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
+. ci/utils.sh
+
 SOURCE_BRANCH="master"
 TARGET_BRANCH="gh-pages"
 
 function compileGhPages {
-  cp -r target/site/jacoco-ut/* out/
+    echo_green "Script executed from: ${PWD}"
+    mkdir out
+    cp -r target/site/jacoco-ut/* out
 }
 
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
@@ -29,8 +33,8 @@ rm -rf out/**/* || exit 0
 
 # Run our compile script
 compileGhPages
-
-# Now let's go have some fun with the cloned repo
+#
+## Now let's go have some fun with the cloned repo
 cd out
 git config user.name "Travis CI"
 git config user.email "$COMMIT_AUTHOR_EMAIL"
