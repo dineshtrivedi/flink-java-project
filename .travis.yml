@@ -8,7 +8,7 @@ jdk:
   - oraclejdk8
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_03a344a6b5dc_key -iv $encrypted_03a344a6b5dc_iv -in deploy_key.enc -out deploy_key -d
+  - openssl aes-256-cbc -K $encrypted_03a344a6b5dc_key -iv $encrypted_03a344a6b5dc_iv -in ../deploy_key.enc -out deploy_key -d
 
 install:
   - ./ci/install-flink-training-exercises.sh
