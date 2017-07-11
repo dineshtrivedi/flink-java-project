@@ -6,11 +6,28 @@
 
 flink-java-project tutorial - http://training.data-artisans.com/
 
-## Travis not working
-I have face problems to use flink-training-exercises package as a dependency.
+## Travis 
+
+It wasn't possible to use TravisCI straight away. Check the problems in the Problems section.
+
+### Problems
+I have face problems using flink-training-exercises package as a dependency.
 
 * There is no version 0.10.0 in the [maven repository](https://mvnrepository.com/artifact/com.data-artisans/flink-training-exercises)
 * I can't pull from github, there is no mvn-repo branch [link](https://stackoverflow.com/questions/14013644/hosting-a-maven-repository-on-github?rq=1)
+
+### Solution
+
+Fortunately, there is a solution :).
+
+First I have added an install step into .travis.yml
+```
+install: ./ci/install-flink-training-exercises.sh
+```
+
+Essentially, the flink-training-exercise is cloned and built.
+
+Check the ci/install-flink-training-exercises.sh to understand how this process is done. 
 
 ## Depencencies
 * sudo apt-get install jq
