@@ -17,7 +17,8 @@ public class TaxiRideCleansingRunner {
 	public static void main(String[] args) throws Exception {
 
 		TaxiRideCleansingParameterParser params = new TaxiRideCleansingParameterParser();
-		if(params.parseParams(args)){
+		// TODO: refactor this method
+		if(!params.parseParams(args)){
 			final String dataFilePath = params.getDataFilePath();
 
 			// get an ExecutionEnvironment

@@ -7,6 +7,14 @@
 flink-java-project tutorial - http://training.data-artisans.com/
 
 Since this project has no frontend I have configured TravisCI to create the github pages showing the coverage. Access coverage page [here](https://dineshtrivedi.github.io/flink-java-project/index.html).
+
+## Tasks
+### Task1 - DataStream API Basics
+This task consist in implement the Ride Cleansing exercise.
+
+### Task2 - DataStream API Time & Windows
+This task consist in implement the Popular Places exercise.
+
 ## Travis 
 
 It wasn't possible to use TravisCI straight away. Check the problems in the Problems section.
