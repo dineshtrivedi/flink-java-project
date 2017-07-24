@@ -1,8 +1,8 @@
 package com.training.data.artisans.taxi;
 
 import com.dataartisans.flinktraining.exercises.datastream_java.datatypes.TaxiRide;
-import com.dataartisans.flinktraining.exercises.datastream_java.sources.TaxiRideSource;
 import com.dataartisans.flinktraining.exercises.datastream_java.utils.GeoUtils;
+import com.dataartisans.flinktraining.exercises.datastream_java.utils.TaxiRideSchema;
 import com.google.common.collect.Iterables;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -14,10 +14,14 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.util.Collector;
+
+import java.util.Properties;
 
 public class PoupularPlacesMain {
 
@@ -36,9 +40,30 @@ public class PoupularPlacesMain {
 				StreamExecutionEnvironment.getExecutionEnvironment();
 		// configure event-time processing
 		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+		// generate a Watermark every second
+		env.getConfig().setAutoWatermarkInterval(1000);
 
-		DataStream<TaxiRide> rides = env.addSource(
-				new TaxiRideSource("/Users/dineshat/solo/flink-java-project/nycTaxiRides.gz", MAX_EVENT_DELAY_DEFAULT, SERVING_SPEED_FACTOR_DEFAULT));
+		// configure Kafka consumer
+		Properties props = new Properties();
+		props.setProperty("zookeeper.connect", "localhost:2181"); // Zookeeper default host:port
+		props.setProperty("bootstrap.servers", "localhost:9092"); // Broker default host:port
+		props.setProperty("group.id", "myGroup");                 // Consumer group ID
+		props.setProperty("auto.offset.reset", "earliest");       // Always read topic from start
+
+		// create a Kafka consumer
+		FlinkKafkaConsumer010<TaxiRide> consumer =
+				new FlinkKafkaConsumer010<>(
+						"cleansedRides",
+						new TaxiRideSchema(),
+						props);
+
+		// assign a timestamp extractor to the consumer
+		consumer.assignTimestampsAndWatermarks(new PopulatPlacesWatermarkOutOfOrdeness(MAX_EVENT_DELAY_DEFAULT));
+
+		DataStream<TaxiRide> rides = env.addSource(consumer);
+
+//		DataStream<TaxiRide> rides = env.addSource(
+//				new TaxiRideSource("/Users/dineshat/solo/flink-java-project/nycTaxiRides.gz", MAX_EVENT_DELAY_DEFAULT, SERVING_SPEED_FACTOR_DEFAULT));
 
 		DataStream<Tuple5<Float, Float, Long, Boolean, Integer>> popoularPlaces = rides
 				.filter(new TaxiRideCleansing.NewYorkTaxiFilter())
@@ -126,6 +151,22 @@ public class PoupularPlacesMain {
 			int count = cell.f3;
 
 			return Tuple5.of(lon, lat, timeWindow, isStart, count);
+		}
+	}
+
+	public static class PopulatPlacesWatermarkOutOfOrdeness extends BoundedOutOfOrdernessTimestampExtractor<TaxiRide> {
+		public PopulatPlacesWatermarkOutOfOrdeness(int maxOutOfOrderness) {
+			super(Time.seconds(maxOutOfOrderness));
+		}
+
+		@Override
+		public long extractTimestamp(TaxiRide ride) {
+			if (ride.isStart) {
+				return ride.startTime.getMillis();
+			}
+			else {
+				return ride.endTime.getMillis();
+			}
 		}
 	}
 }

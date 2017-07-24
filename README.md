@@ -10,10 +10,68 @@ Since this project has no frontend I have configured TravisCI to create the gith
 
 ## Tasks
 ### Task1 - DataStream API Basics
-This task consist in implement the Ride Cleansing exercise.
+This task consist in implement the Ride Cleansing exercise. Running:
+* Start local flink:
+```
+cd /path/to/flink/installation
+./bin/start-local.sh
+```
+
+It also starts the WebGUI - [http://localhost:8081](http://localhost:8081).
+
+* Submit a job
+```
+cd /path/to/flink/installation
+./bin/flink run -c com.training.data.artisans.taxi.TaxiRideCleansingRunner /path/to/program/target/flink-java-project-0.1.jar --input "/path/to/nycTaxiRides.gz"
+```
+
+* Stoping local flink:
+```
+cd /path/to/flink/installation
+./bin/stop-local.sh
+```
 
 ### Task2 - DataStream API Time & Windows
 This task consist in implement the Popular Places exercise.
+* Start local flink:
+```
+cd /path/to/flink/installation
+./bin/start-local.sh
+```
+
+It also starts the WebGUI - [http://localhost:8081](http://localhost:8081).
+
+* Submit a job
+```
+cd /path/to/flink/installation
+./bin/flink run -c com.training.data.artisans.taxi.PoupularPlacesMain /path/to/program/target/flink-java-project-0.1.jar
+```
+
+* Stoping local flink:
+```
+cd /path/to/flink/installation
+./bin/stop-local.sh
+```
+
+### Task3 - DataStream API Time & Windows
+
+* Start Zookeeper (Kafka uses ZooKeeper for distributed coordination) on localhost:2181
+```
+cd path/to/kafka_2.10-0.10.2.0
+./bin/zookeeper-server-start.sh config/zookeeper.properties &
+```
+
+* Start a Kafka instance on localhost:9092:
+```
+cd path/to/kafka_2.10-0.10.2.0
+./bin/kafka-server-start.sh config/server.properties &
+```
+
+* Stop Kafka and ZooKeeper by calling scripts below in exactly the same order.
+```
+./bin/kafka-server-stop.sh 
+./bin/zookeeper-server-stop.sh
+```
 
 ## Travis 
 
