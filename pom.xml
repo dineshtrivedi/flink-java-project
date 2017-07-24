@@ -106,7 +106,24 @@ under the License.
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-connector-kafka-0.10_2.10</artifactId>
-			<version>1.2.0</version>
+			<version>${flink.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-elasticsearch2_2.10</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+		<!--
+		java.lang.NoClassDefFoundError: Could not initialize class org.elasticsearch.threadpool.ThreadPool
+			at org.elasticsearch.client.transport.TransportClient$Builder.build(TransportClient.java:130)
+		https://discuss.elastic.co/t/could-not-initialize-class-org-elasticsearch-threadpool-threadpool/47575
+
+		You can find guava imports: com.google.common.*
+		-->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>22.0</version>
 		</dependency>
 
 		<!-- explicitly add a standard loggin framework, as Flink does not have

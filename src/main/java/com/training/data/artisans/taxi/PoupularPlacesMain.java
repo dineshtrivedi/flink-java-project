@@ -1,27 +1,41 @@
 package com.training.data.artisans.taxi;
 
+
 import com.dataartisans.flinktraining.exercises.datastream_java.datatypes.TaxiRide;
 import com.dataartisans.flinktraining.exercises.datastream_java.utils.GeoUtils;
 import com.dataartisans.flinktraining.exercises.datastream_java.utils.TaxiRideSchema;
 import com.google.common.collect.Iterables;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RuntimeContext;
 import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkFunction;
+import org.apache.flink.streaming.connectors.elasticsearch.RequestIndexer;
+import org.apache.flink.streaming.connectors.elasticsearch2.ElasticsearchSink;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.util.Collector;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.client.Requests;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+
 
 public class PoupularPlacesMain {
 
@@ -74,7 +88,20 @@ public class PoupularPlacesMain {
 				.filter(new PopularPlaceThresholdFilter(POPULAR_PLACES_COUNTER_THRESHOLD))
 				.map(new MapFromGridCellToLatLon());
 
-		popoularPlaces.print();
+		Map<String, String> config = new HashMap<>();
+		config.put("bulk.flush.max.actions", "10");   // flush inserts after every event
+		config.put("cluster.name", "elasticsearch"); // default cluster name
+
+		List<InetSocketAddress> transports = new ArrayList<>();
+// set default connection details
+		transports.add(new InetSocketAddress(InetAddress.getByName("localhost"), 9300));
+
+		popoularPlaces.addSink(
+				new ElasticsearchSink<>(config, transports, new PopularPlaceInserter()))
+//				.setParallelism(1)
+				.name("ES_Sink");
+
+//		popoularPlaces.print();
 		env.execute("Popular place task");
 	}
 
@@ -167,6 +194,30 @@ public class PoupularPlacesMain {
 			else {
 				return ride.endTime.getMillis();
 			}
+		}
+	}
+
+	public static class PopularPlaceInserter implements ElasticsearchSinkFunction<Tuple5<Float, Float, Long, Boolean, Integer>> {
+
+		@Override
+		public void process(
+				Tuple5<Float, Float, Long, Boolean, Integer> record,
+				RuntimeContext ctx,
+				RequestIndexer indexer) {
+
+			// construct JSON document to index
+			Map<String, String> json = new HashMap<>();
+			json.put("time", record.f2.toString());         // timestamp
+			json.put("location", record.f1+","+record.f0);  // lat,lon pair
+			json.put("isStart", record.f3.toString());      // isStart
+			json.put("cnt", record.f4.toString());          // count
+
+			IndexRequest rqst = Requests.indexRequest()
+					.index("nyc-places")           // index name
+					.type("popular-locations")     // mapping name
+					.source(json);
+
+			indexer.add(rqst);
 		}
 	}
 }
