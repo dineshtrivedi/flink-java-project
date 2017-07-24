@@ -17,26 +17,27 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 	public static void main(String[] args) throws Exception {
 
 <span class="nc" id="L19">		TaxiRideCleansingParameterParser params = new TaxiRideCleansingParameterParser();</span>
-<span class="nc bnc" id="L20" title="All 2 branches missed.">		if(params.parseParams(args)){</span>
-<span class="nc" id="L21">			final String dataFilePath = params.getDataFilePath();</span>
+		// TODO: refactor this method
+<span class="nc bnc" id="L21" title="All 2 branches missed.">		if(!params.parseParams(args)){</span>
+<span class="nc" id="L22">			final String dataFilePath = params.getDataFilePath();</span>
 
 			// get an ExecutionEnvironment
 			StreamExecutionEnvironment env =
-<span class="nc" id="L25">					StreamExecutionEnvironment.getExecutionEnvironment();</span>
+<span class="nc" id="L26">					StreamExecutionEnvironment.getExecutionEnvironment();</span>
 			// configure event-time processing
-<span class="nc" id="L27">			env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);</span>
+<span class="nc" id="L28">			env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);</span>
 
 			// get the taxi ride data stream
-<span class="nc" id="L30">			DataStream&lt;TaxiRide&gt; rides = env.addSource(</span>
+<span class="nc" id="L31">			DataStream&lt;TaxiRide&gt; rides = env.addSource(</span>
 					new TaxiRideSource(dataFilePath, MAX_EVENT_DELAY_DEFAULT, SERVING_SPEED_FACTOR_DEFAULT));
 
-<span class="nc" id="L33">			TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing();</span>
-<span class="nc" id="L34">			DataStream&lt;TaxiRide&gt; filteredTaxis = taxiRideCleansing.execute(rides);</span>
+<span class="nc" id="L34">			TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing();</span>
+<span class="nc" id="L35">			DataStream&lt;TaxiRide&gt; filteredTaxis = taxiRideCleansing.execute(rides);</span>
 
-<span class="nc" id="L36">			filteredTaxis.print();</span>
-<span class="nc" id="L37">			env.execute(&quot;Running Taxi Ride Cleansing&quot;);</span>
+<span class="nc" id="L37">			filteredTaxis.print();</span>
+<span class="nc" id="L38">			env.execute(&quot;Running Taxi Ride Cleansing&quot;);</span>
 		}
-<span class="nc" id="L39">	}</span>
+<span class="nc" id="L40">	}</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

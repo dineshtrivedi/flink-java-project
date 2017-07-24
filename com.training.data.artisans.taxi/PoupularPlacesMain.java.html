@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PoupularPlacesMain.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Flink Quickstart Job</a> &gt; <a href="index.source.html" class="el_package">com.training.data.artisans.taxi</a> &gt; <span class="el_source">PoupularPlacesMain.java</span></div><h1>PoupularPlacesMain.java</h1><pre class="source lang-java linenums">package com.training.data.artisans.taxi;
+
+import com.dataartisans.flinktraining.exercises.datastream_java.datatypes.TaxiRide;
+import com.dataartisans.flinktraining.exercises.datastream_java.sources.TaxiRideSource;
+import com.dataartisans.flinktraining.exercises.datastream_java.utils.GeoUtils;
+import com.google.common.collect.Iterables;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.streaming.api.TimeCharacteristic;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.KeyedStream;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.util.Collector;
+
+<span class="nc" id="L22">public class PoupularPlacesMain {</span>
+
+	// events are out of order by max 60 seconds
+	private static final int MAX_EVENT_DELAY_DEFAULT = 60;
+
+	// events of 10 minutes are served in 1 second (10 * 60) = 600s
+	private static final int SERVING_SPEED_FACTOR_DEFAULT = 600;
+
+	private static final int POPULAR_PLACES_COUNTER_THRESHOLD = 20;
+
+	public static void main(String[] args) throws Exception {
+
+		// get an ExecutionEnvironment
+		StreamExecutionEnvironment env =
+<span class="nc" id="L36">				StreamExecutionEnvironment.getExecutionEnvironment();</span>
+		// configure event-time processing
+<span class="nc" id="L38">		env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);</span>
+
+<span class="nc" id="L40">		DataStream&lt;TaxiRide&gt; rides = env.addSource(</span>
+				new TaxiRideSource(&quot;/Users/dineshat/solo/flink-java-project/nycTaxiRides.gz&quot;, MAX_EVENT_DELAY_DEFAULT, SERVING_SPEED_FACTOR_DEFAULT));
+
+<span class="nc" id="L43">		DataStream&lt;Tuple5&lt;Float, Float, Long, Boolean, Integer&gt;&gt; popoularPlaces = rides</span>
+<span class="nc" id="L44">				.filter(new TaxiRideCleansing.NewYorkTaxiFilter())</span>
+<span class="nc" id="L45">				.map(new MapToGridCell())</span>
+<span class="nc" id="L46">				.&lt;KeyedStream&lt;Tuple2&lt;Integer, Boolean&gt;, Tuple2&lt;Integer, Boolean&gt;&gt;&gt;keyBy(0, 1)</span>
+<span class="nc" id="L47">				.timeWindow(Time.minutes(15), Time.minutes(5))</span>
+<span class="nc" id="L48">				.apply(new RideCounterWindowFunction())</span>
+<span class="nc" id="L49">				.filter(new PopularPlaceThresholdFilter(POPULAR_PLACES_COUNTER_THRESHOLD))</span>
+<span class="nc" id="L50">				.map(new MapFromGridCellToLatLon());</span>
+
+<span class="nc" id="L52">		popoularPlaces.print();</span>
+<span class="nc" id="L53">		env.execute(&quot;Popular place task&quot;);</span>
+<span class="nc" id="L54">	}</span>
+
+<span class="nc" id="L56">	public static class MapToGridCell implements MapFunction&lt;TaxiRide, Tuple2&lt;Integer, Boolean&gt;&gt; {</span>
+
+		@Override
+		public Tuple2&lt;Integer, Boolean&gt; map(TaxiRide taxiRide) throws Exception {
+			float lon;
+			float lat;
+<span class="nc" id="L62">			final boolean isStart = taxiRide.isStart;</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">			if(isStart) {</span>
+<span class="nc" id="L64">				lon = taxiRide.startLon;</span>
+<span class="nc" id="L65">				lat = taxiRide.startLat;</span>
+			}
+			else {
+<span class="nc" id="L68">				lon = taxiRide.endLon;</span>
+<span class="nc" id="L69">				lat = taxiRide.endLat;</span>
+			}
+
+<span class="nc" id="L72">			int gridId = GeoUtils.mapToGridCell(lon, lat);</span>
+<span class="nc" id="L73">			return Tuple2.of(gridId, isStart);</span>
+		}
+	}
+
+<span class="nc" id="L77">	public static class RideCounterWindowFunction implements WindowFunction&lt;</span>
+			// input type
+			Tuple2&lt;Integer, Boolean&gt;,
+			// output type
+			Tuple4&lt;Integer, Long, Boolean, Integer&gt;,
+			// key type
+			Tuple,
+			// window type
+			TimeWindow&gt;
+	{
+
+		@Override
+		public void apply(Tuple key, TimeWindow timeWindow, Iterable&lt;Tuple2&lt;Integer, Boolean&gt;&gt; events,
+				Collector&lt;Tuple4&lt;Integer, Long, Boolean, Integer&gt;&gt; collector) throws Exception {
+
+<span class="nc" id="L92">			Tuple2&lt;Integer, Boolean&gt; castedKey = (Tuple2&lt;Integer, Boolean&gt;)key;</span>
+<span class="nc" id="L93">			int gridId = castedKey.f0;</span>
+<span class="nc" id="L94">			boolean isStart = castedKey.f1;</span>
+<span class="nc" id="L95">			long windowTime = timeWindow.getEnd();</span>
+<span class="nc" id="L96">			int rideCounter = Iterables.size(events);</span>
+
+<span class="nc" id="L98">			collector.collect(Tuple4.of(gridId, windowTime, isStart, rideCounter));</span>
+<span class="nc" id="L99">		}</span>
+	}
+
+	public static final class PopularPlaceThresholdFilter implements FilterFunction&lt;Tuple4&lt;Integer, Long, Boolean, Integer&gt;&gt; {
+
+		private final int popularPlacesCounterThreshold;
+
+<span class="nc" id="L106">		public PopularPlaceThresholdFilter(int popularPlacesCounterThreshold) {</span>
+<span class="nc" id="L107">			this.popularPlacesCounterThreshold = popularPlacesCounterThreshold;</span>
+<span class="nc" id="L108">		}</span>
+
+		@Override
+		public boolean filter(Tuple4&lt;Integer, Long, Boolean, Integer&gt; place) {
+<span class="nc bnc" id="L112" title="All 2 branches missed.">			return place.f3 &gt;= popularPlacesCounterThreshold;</span>
+		}
+	}
+
+<span class="nc" id="L116">	public static class MapFromGridCellToLatLon implements MapFunction&lt;Tuple4&lt;Integer, Long, Boolean, Integer&gt;,</span>
+			Tuple5&lt;Float, Float, Long, Boolean, Integer&gt;&gt; {
+
+
+		@Override
+		public Tuple5&lt;Float, Float, Long, Boolean, Integer&gt; map(Tuple4&lt;Integer, Long, Boolean, Integer&gt; cell) throws Exception {
+<span class="nc" id="L122">			float lon = GeoUtils.getGridCellCenterLon(cell.f0);</span>
+<span class="nc" id="L123">			float lat = GeoUtils.getGridCellCenterLat(cell.f0);</span>
+<span class="nc" id="L124">			long timeWindow = cell.f1;</span>
+<span class="nc" id="L125">			boolean isStart = cell.f2;</span>
+<span class="nc" id="L126">			int count = cell.f3;</span>
+
+<span class="nc" id="L128">			return Tuple5.of(lon, lat, timeWindow, isStart, count);</span>
+		}
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
