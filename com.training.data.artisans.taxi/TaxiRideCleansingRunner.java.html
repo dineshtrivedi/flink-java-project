@@ -2,11 +2,13 @@
 
 import com.dataartisans.flinktraining.exercises.datastream_java.datatypes.TaxiRide;
 import com.dataartisans.flinktraining.exercises.datastream_java.sources.TaxiRideSource;
+import com.dataartisans.flinktraining.exercises.datastream_java.utils.TaxiRideSchema;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 
-<span class="nc" id="L9">public class TaxiRideCleansingRunner {</span>
+<span class="nc" id="L11">public class TaxiRideCleansingRunner {</span>
 
 	// events are out of order by max 60 seconds
 	private static final int MAX_EVENT_DELAY_DEFAULT = 60;
@@ -16,28 +18,34 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 	public static void main(String[] args) throws Exception {
 
-<span class="nc" id="L19">		TaxiRideCleansingParameterParser params = new TaxiRideCleansingParameterParser();</span>
+<span class="nc" id="L21">		TaxiRideCleansingParameterParser params = new TaxiRideCleansingParameterParser();</span>
 		// TODO: refactor this method
-<span class="nc bnc" id="L21" title="All 2 branches missed.">		if(!params.parseParams(args)){</span>
-<span class="nc" id="L22">			final String dataFilePath = params.getDataFilePath();</span>
+<span class="nc bnc" id="L23" title="All 2 branches missed.">		if(!params.parseParams(args)){</span>
+<span class="nc" id="L24">			final String dataFilePath = params.getDataFilePath();</span>
 
 			// get an ExecutionEnvironment
 			StreamExecutionEnvironment env =
-<span class="nc" id="L26">					StreamExecutionEnvironment.getExecutionEnvironment();</span>
+<span class="nc" id="L28">					StreamExecutionEnvironment.getExecutionEnvironment();</span>
 			// configure event-time processing
-<span class="nc" id="L28">			env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);</span>
+<span class="nc" id="L30">			env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);</span>
 
 			// get the taxi ride data stream
-<span class="nc" id="L31">			DataStream&lt;TaxiRide&gt; rides = env.addSource(</span>
+<span class="nc" id="L33">			DataStream&lt;TaxiRide&gt; rides = env.addSource(</span>
 					new TaxiRideSource(dataFilePath, MAX_EVENT_DELAY_DEFAULT, SERVING_SPEED_FACTOR_DEFAULT));
 
-<span class="nc" id="L34">			TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing();</span>
-<span class="nc" id="L35">			DataStream&lt;TaxiRide&gt; filteredTaxis = taxiRideCleansing.execute(rides);</span>
+<span class="nc" id="L36">			TaxiRideCleansing taxiRideCleansing = new TaxiRideCleansing();</span>
+<span class="nc" id="L37">			DataStream&lt;TaxiRide&gt; filteredRides = taxiRideCleansing.execute(rides);</span>
 
-<span class="nc" id="L37">			filteredTaxis.print();</span>
-<span class="nc" id="L38">			env.execute(&quot;Running Taxi Ride Cleansing&quot;);</span>
+<span class="nc" id="L39">			filteredRides.addSink(new FlinkKafkaProducer010&lt;&gt;(</span>
+					&quot;localhost:9092&quot;,      // Kafka broker host:port
+					&quot;cleansedRides&quot;,       // Topic to write to
+					new TaxiRideSchema())  // Serializer (provided as util)
+			);
+
+//			filteredRides.print();
+<span class="nc" id="L46">			env.execute(&quot;Running Taxi Ride Cleansing&quot;);</span>
 		}
-<span class="nc" id="L40">	}</span>
+<span class="nc" id="L48">	}</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

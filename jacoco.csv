@@ -5,12 +5,14 @@ Flink Quickstart Job,org.apache.flink.quickstart,BatchJob,10,0,0,0,4,0,2,0,2,0
 Flink Quickstart Job,org.apache.flink.quickstart,StreamingJob,10,0,0,0,4,0,2,0,2,0
 Flink Quickstart Job,org.apache.flink.quickstart,WordCount,44,0,0,0,9,0,2,0,2,0
 Flink Quickstart Job,org.apache.flink.quickstart,WordCount.LineSplitter,36,0,4,0,6,0,4,0,2,0
-Flink Quickstart Job,com.training.data.artisans.taxi,PoupularPlacesMain,64,0,0,0,15,0,2,0,2,0
+Flink Quickstart Job,com.training.data.artisans.taxi,PoupularPlacesMain.PopularPlaceInserter,65,0,0,0,12,0,2,0,2,0
+Flink Quickstart Job,com.training.data.artisans.taxi,PoupularPlacesMain.PopulatPlacesWatermarkOutOfOrdeness,17,0,2,0,5,0,3,0,2,0
+Flink Quickstart Job,com.training.data.artisans.taxi,PoupularPlacesMain,141,0,0,0,29,0,2,0,2,0
 Flink Quickstart Job,com.training.data.artisans.taxi,PoupularPlacesMain.MapToGridCell,31,0,2,0,9,0,3,0,2,0
 Flink Quickstart Job,com.training.data.artisans.taxi,TaxiRideCleansing.NewYorkTaxiFilter,8,11,3,1,0,3,2,2,0,2
 Flink Quickstart Job,com.training.data.artisans.taxi,TaxiRideCleansing,0,11,0,0,0,4,0,2,0,2
 Flink Quickstart Job,com.training.data.artisans.taxi,PoupularPlacesMain.MapFromGridCellToLatLon,42,0,0,0,7,0,2,0,2,0
 Flink Quickstart Job,com.training.data.artisans.taxi,PoupularPlacesMain.PopularPlaceThresholdFilter,17,0,2,0,4,0,3,0,2,0
 Flink Quickstart Job,com.training.data.artisans.taxi,PoupularPlacesMain.RideCounterWindowFunction,34,0,0,0,8,0,2,0,2,0
-Flink Quickstart Job,com.training.data.artisans.taxi,TaxiRideCleansingRunner,44,0,2,0,12,0,3,0,2,0
+Flink Quickstart Job,com.training.data.artisans.taxi,TaxiRideCleansingRunner,52,0,2,0,12,0,3,0,2,0
 Flink Quickstart Job,com.training.data.artisans.taxi,TaxiRideCleansingParameterParser,0,43,0,2,0,17,0,5,0,4
